@@ -19,6 +19,7 @@ db = client[g_db_name]
 
 app = Flask(__name__)
 
+
 #默认配置
 app.config.update(dict(
     DEBUG = True,
@@ -26,6 +27,30 @@ app.config.update(dict(
     USERNAME = 'admin',
     PASSWORD = 'adadad'
 ))
+
+
+
+@app.route('/test_it')
+def web_show(param='name',word='ak'): #这里不知道怎么传参数，能解决的就帮忙解决一下
+    show='<center>'
+    try:
+        results=db.person.find({param:word})
+        for result in results:            
+            show=show+str(result)
+            show=show+'<p>'
+    except:
+        return show
+    show=show+'</center>'
+    return show
+    
+
+#正则表达式，用来将查询结果的字段和值分开显示
+#def show_column():
+    
+
+
+
+
 
 @app.route('/')
 def main_redirect():
