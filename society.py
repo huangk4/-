@@ -35,7 +35,7 @@ def web_show(param,word): #这里不知道怎么传参数，能解决的就帮�
     
 
 #正则表达式，用来将查询结果的字段和值分开显示
-def show_column():
+#def show_column():
     
 
 

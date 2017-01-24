@@ -1,4 +1,4 @@
-# 寒假项目
+﻿# 寒假项目
 ##主要功能
 ###人员信息的导入
 - 支持txt、csv等文本格式
@@ -29,4 +29,5 @@
 - python3操作mongodb实例 http://www.2cto.com/kf/201701/584915.html
 
 ###Flask
-- Flask教程http://www.jb51.net/article/64434.htm
+- http://www.jb51.net/article/64434.htm
+- http://www.oschina.net/translate/the-flask-mega-tutorial-part-i-hello-world
