@@ -21,7 +21,7 @@ db = client[g_db_name]
 app = Flask(__name__)
 
 @app.route('/')
-def web_show(param,word): #这里不知道怎么传参数，能解决的就帮忙解决一下
+def web_show(param='name',word='ak'): #这里不知道怎么传参数，能解决的就帮忙解决一下
     show='<center>'
     try:
         results=db.person.find({param:word})
