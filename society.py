@@ -111,17 +111,55 @@ def upload():
         file_dir=os.path.join(basedir,app.config['UPLOAD_FOLDER'])
         if not os.path.exists(file_dir):
             os.makedirs(file_dir)
-        f=request.files['file']  # 从表单的file字段获取文件，myfile为该表单的name值
-        if f and allowed_file(f.filename):  # 判断是否是允许上传的文件类型
+        # 从表单的file字段获取文件，myfile为该表单的name值
+        f=request.files['file']  
+        # 判断是否是允许上传的文件类型
+        if f and allowed_file(f.filename):  
             fname=secure_filename(f.filename)
-            ext = fname.rsplit('.',1)[1]  # 获取文件后缀
+            # 获取文件后缀
+            ext = fname.rsplit('.',1)[1]  
             #随机生成文件名
             tempname=("".join(random.sample(['z','y','x','w','v',\
-                                             'u','t','s'],5)).replace(' '\
-                                                                      ,''))
-            new_filename=tempname+'.'+ext  # 修改了上传的文件名
-            f.save(os.path.join(file_dir,new_filename))  #保存文件到upload目录
-            file_insert(new_filename)
+                                             'u','t','s'],5)).replace(\
+                                                 ' ',''))
+            # 修改了上传的文件名
+            new_filename=tempname+'.'+ext
+            #保存文件到upload目录
+            f.save(os.path.join(file_dir,new_filename))  
+
+
+            #txt以' '分开，csv以','分开
+            fenge=' '
+            if ext=='txt':
+                fenge=' '
+            else:
+                fenge=','
+
+
+            #判断文件是否成功保存
+            path='static\\tmp\\'+new_filename
+            if (not os.path.exists(path)):
+                #print('no file')
+                return
+
+
+            #读取文件转换格式插入数据库
+            fp=open(path,'r')
+            for line in fp:
+                linedata={}
+                line=line.strip('\n')
+                group=line.split(fenge)    
+                for key in group:
+                    data=key.split(':')
+                    linedata[data[0]]=data[1]
+                #print(linedata)
+                db.person.save(linedata)
+            db.person.find()
+
+            
+            #关闭文件，删除文件
+            fp.close()
+            os.remove(path)
             return "上传成功"
         else:
             return "上传失败"
@@ -138,32 +176,6 @@ def main_upload():
     
     return render_template('upload.html',columns=columns)
 
-#读取上传文本导入数据库
-def file_insert(filename):
-    ext = filename.rsplit('.',1)[1]  # 获取文件后缀
-    fenge=' '
-    if ext=='txt':
-        fenge=' '
-    else:
-        fenge=','
-    path='static\\tmp\\'+filename
-    #print(os.path.exists(path))
-    if (not os.path.exists(path)):
-        #print('no file')
-        return
-    fp=open(path,'r')
-    for line in fp:
-        linedata={}
-        line=line.strip('\n')
-        group=line.split(fenge)    
-        for key in group:
-            data=key.split(':')
-            linedata[data[0]]=data[1]
-        #print(linedata)
-        db.person.save(linedata)
-    db.person.find()
-    fp.close()
-    os.remove(path)
     
 
 #查询函数，param为查询字段，word为查询的值
