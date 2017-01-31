@@ -2,16 +2,23 @@
 {% block body %}
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='table.css') }}">
 <h1>批量导入</h1>
+以':'区分键和值,txt以' '分开数据,csv以','分开数据，如：
+<p>
+txt文件:name:999 emai:asdfse342@163.com
+</p>
+<p>
+csv文件:name:999,emai:asdfse342@163.com
+</p>
 <form action="upload" method=post enctype=multipart/form-data>
 <p>
 <input type=file name=file>
 <input type=submit value="导入">
 </p>
 </form>
-<h1>单条导入</h1>
-<form method="post"> 
+<h1>快速导入</h1>
+<form action="insert_one" method="post"> 
 <table class="formdata"> 
-<caption>请输入数据并提交(id不用填写，所有数据都非必填）</caption> 
+<caption>请输入基本数据并提交(id保留使用，不用填写，数据没有可空缺）</caption> 
 <tr> 
 {% for column in columns %}
     <th scope="col">{{column}}</th>
@@ -20,7 +27,7 @@
 
 <tr> 
 {% for column in columns %}
-    <td><input type="text" name="data" id="{{column}}"/></td> 
+    <td><input type="text" name="{{column}}" id="{{column}}"/></td> 
 {% endfor %}
 </tr> 
 </table> 
@@ -28,14 +35,6 @@
 </form> 
 <br> 
 <br> 
-<p></p> 
-<pre></pre> 
-<br> 
-<br> 
-<p></p> 
 
-</textarea>
-
-<h1>自定义字段导入</h1>
 
 {% endblock %}

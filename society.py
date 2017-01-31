@@ -100,13 +100,10 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
-def insert_format(data):
-    db.person.save({data})
 
-
+#接受上传文件并导入数据，删除上传文件
 @app.route('/upload',methods=['GET','POST'],strict_slashes=False)
-def upload():
-    #上传文件导入数据
+def upload(): 
     if request.method=='POST':
         file_dir=os.path.join(basedir,app.config['UPLOAD_FOLDER'])
         if not os.path.exists(file_dir):
@@ -164,12 +161,31 @@ def upload():
         else:
             return "上传失败"
 
+
+#单条导入
+@app.route('/insert_one',methods=['GET','POST'],strict_slashes=False)
+def insert_one():
+    if request.method == 'POST':
+        for line in db.person.find().limit(1):
+            pass
+    
+        linedata={}
+        for i in line:
+            if i=='_id':
+                continue
+            linedata[i]=request.form[i]
+        db.person.save(linedata)
+        return 'success'
+
+
+#信息导入页面
 @app.route('/insert_data')
 def main_upload():
     for line in db.person.find().limit(1):
         #返回一行数据
         pass
 
+    #columns为所有列名的列表
     columns=[]
     for i in line:
         columns.append(i)
