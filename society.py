@@ -1,7 +1,7 @@
 #coding:utf-8
 from pymongo import MongoClient
 from flask import Flask, request, session, redirect, \
-    render_template, url_for, flash,jsonify
+    render_template, url_for, flash, jsonify, abort
 from werkzeug import secure_filename
 import os
 import random
@@ -9,7 +9,7 @@ import string
 
 
 #这里写宏和配置信息
-g_server_ip='192.168.65.137'
+g_server_ip='127.0.0.1'
 g_server_port=27017
 g_db_name='test'  #库名表名先用自己的
 g_tb_name='table_one'
@@ -124,7 +124,6 @@ def upload():
             #保存文件到upload目录
             f.save(os.path.join(file_dir,new_filename))  
 
-
             #txt以' '分开，csv以','分开
             fenge=' '
             if ext=='txt':
@@ -132,13 +131,11 @@ def upload():
             else:
                 fenge=','
 
-
             #判断文件是否成功保存
             path='static\\tmp\\'+new_filename
             if (not os.path.exists(path)):
                 #print('no file')
                 return
-
 
             #读取文件转换格式插入数据库
             fp=open(path,'r')
@@ -153,7 +150,6 @@ def upload():
                 db.person.save(linedata)
             db.person.find()
 
-            
             #关闭文件，删除文件
             fp.close()
             os.remove(path)
@@ -181,6 +177,7 @@ def insert_one():
 #信息导入页面
 @app.route('/insert_data')
 def main_upload():
+    line = []
     for line in db.person.find().limit(1):
         #返回一行数据
         pass
@@ -190,14 +187,45 @@ def main_upload():
     for i in line:
         columns.append(i)
     
+    columns.sort()
+
     return render_template('upload.html',columns=columns)
 
-    
+#查询信息
+@app.route('/searchinfo', methods = ['POST', 'GET'])
+def searchinfo():
+    if request.method == 'POST':
+        
+        line = []
+        for line in db.person.find().limit(1):
+            #返回一行数据
+            pass
+
+        #columns为所有列名的列表
+        columns=[]
+        for i in line:
+            columns.append(i)        
+        columns.sort()
+
+        if request.form.get('type',None) == 'name':
+            infos = db.person.find({request.form.get('type',None):request.form.get('username',None)})
+            if infos:
+                flash('success')
+            else:
+                flash('failed')
+        
+            return render_template('searchinfo.html', infos=infos, columns=columns)
+        else:
+            flash('Erorr')
+            return render_template('searchinfo.html')
+    if request.method == 'GET':
+        return render_template('searchinfo.html')
+
 
 #查询函数，param为查询字段，word为查询的值
 def search(param,word):
    try:
-       results=db.person.find({param:word})
+       results = db.person.find({param:word})
        for result in results:
            print(result)
    except:
