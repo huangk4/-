@@ -51,15 +51,6 @@ def web_show(param='name',word='ak'): #这里不知道怎么传参数，能解�
     show=show+'</center>'
     return show
     
-
-#正则表达式，用来将查询结果的字段和值分开显示
-#def show_column():
-    
-
-
-
-
-
 @app.route('/')
 def main_redirect():
     return redirect(url_for('login'))
@@ -76,25 +67,14 @@ def login():
         else:
             session['logged_in'] = True
             flash('You were logged in')
-            return redirect(url_for('show'))
+            return redirect(url_for('searchinfo'))
     return render_template('login.html', error=error)
 
 @app.route('/logout')
 def logout():
     session.pop('logged_in', None)
     flash('You were logged out')
-    return redirect(url_for('show'))
-
-@app.route('/show')
-def show():
-    #待实现
-    return render_template('showdb.html')
-
-@app.route('/add', methods=['POST'])
-def add_document():
-    #添加，待实现
-    return redirect(url_for('show'))
-
+    return redirect(url_for('searchinfo'))
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -207,29 +187,34 @@ def searchinfo():
             columns.append(i)        
         columns.sort()
 
-        if request.form.get('type',None) == 'name':
-            infos = db.person.find({request.form.get('type',None):request.form.get('username',None)})
+        if request.form.get('type') in ['name', 'email', 'password', 'passwordHash']:
+            infos = db.person.find({request.form.get('type'):request.form.get('inputinfo')})
             if infos:
-                flash('success')
+                flash('successed')
             else:
                 flash('failed')
         
+            for doc in infos:
+                print(doc)
+                print(doc['name'])
             return render_template('searchinfo.html', infos=infos, columns=columns)
+
         else:
             flash('Erorr')
             return render_template('searchinfo.html')
+            
     if request.method == 'GET':
         return render_template('searchinfo.html')
 
 
-#查询函数，param为查询字段，word为查询的值
-def search(param,word):
-   try:
-       results = db.person.find({param:word})
-       for result in results:
-           print(result)
-   except:
-       print('没有结果')
+# #查询函数，param为查询字段，word为查询的值
+# def search(param,word):
+#    try:
+#        results = db.person.find({param:word})
+#        for result in results:
+#            print(result)
+#    except:
+#        print('没有结果')
 
 
 if __name__=='__main__':

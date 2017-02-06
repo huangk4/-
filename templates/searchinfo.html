@@ -6,40 +6,40 @@
     <form action="{{ url_for('searchinfo') }}" method="POST">
     <dl>
       <dt>Input:
-      <dd><input type="text" name="username">
+      <dd><input type="text" name="inputinfo">
       <br>
       <dt>Type: 
       <dd>
         <select name="type" onchange="submit()">
         <option value="name">name</option>
-        <option value="mail">email</option>
+        <option value="email">email</option>
+        <option value="password">password</option>
+        <option value="passwordHash">passwordHash</option>
         </select>      
     </dl>
     <p><input type="submit" value="Search"></p>
     </form>
-<!--
-    <p>infos</p>
-    {% for p in infos %}
-        <p>{{p}}</p>
-        <p>{{p['_id']}}</p>
-        <p>{{p['name']}}</p>
-    {% endfor %}-->
 
+    {% if infos %}
+    <p>INFOS:</p>
     <table class="formdata">
-        <tr>
+        <!--<tr>
             <th>email</th>
             <th>name</th>
             <th>password</th>
             <th>passwordHash</th>
-        </tr>
+        </tr>-->
         {% for doc in infos %}
         <tr>
             <td>{{ doc['email'] }}</td>
-            <td>{{ doc['name'] }}</td>
+            <td>{{ doc['email'] }}</td>
             <td>{{ doc['password'] }}</td>
             <td>{{ doc['passwordHash'] }}</td>
         </tr>
         {% endfor %}
     </table>
+    {% else %}
+        <p>NO INFOS</p>
+    {% endif %}
 
 {% endblock %}
