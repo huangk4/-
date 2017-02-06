@@ -6,6 +6,7 @@ from werkzeug import secure_filename
 import os
 import random
 import string
+import re
 
 
 #这里写宏和配置信息
@@ -181,8 +182,8 @@ def insert_one():
 #信息导入页面
 @app.route('/insert_data')
 def main_upload():
-    for line in db.person.find().limit(1):
-        #返回一行数据
+    for line in db.person.find({},{"_id":0}).limit(1):
+        #返回一行数据,{"_id":0}即不显示_id
         pass
 
     #columns为所有列名的列表
@@ -204,10 +205,38 @@ def search(param,word):
        print('没有结果')
 
 
+#邮箱后缀分析函数,查询数据库返回所有邮箱后缀及所占比的字典
+def analysis_email():
+    wei=[]
+    count={}
+    results= db.person.find({},{"email":1,"_id":0})
+    for result in results:
+        if 'email' in result:
+            #print(result['email'])
+            m=re.search('@.+?\.com',result['email'])
+            if m:
+                email=m.group()
+                #print(type(m.group()))
+                if not email in wei:
+                    wei.append(m.group())
+                    count[email]=1
+                else:
+                    count[email]+=1
+    counts=0
+    emails={}
+    for i in count:
+        counts+=count[i]
+    for i in count:
+        emails[i]=str(((count[i]/counts)*100)%101)
+    print(emails)
+    return emails
+        
+
 if __name__=='__main__':
     
     #file_insert('wxsuv.txt')
     #search('name','ak')
-    app.run()
+    #app.run()
+    analysis_email()
     
 
