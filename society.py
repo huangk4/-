@@ -188,15 +188,16 @@ def searchinfo():
         columns.sort()
 
         if request.form.get('type') in ['name', 'email', 'password', 'passwordHash']:
-            infos = db.person.find({request.form.get('type'):request.form.get('inputinfo')})
-            if infos:
+            found = db.person.find({request.form.get('type'):request.form.get('inputinfo')})
+            if found:
                 flash('successed')
             else:
                 flash('failed')
-        
-            for doc in infos:
-                print(doc)
-                print(doc['name'])
+            
+            infos = []
+            for doc in found:
+                infos.append(doc)
+                
             return render_template('searchinfo.html', infos=infos, columns=columns)
 
         else:
