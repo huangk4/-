@@ -1,0 +1,44 @@
+{% extends "layout.html" %}
+{% block body %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='table.css') }}">
+    <h2>Search</h2>
+    <form action="{{ url_for('searchinfo') }}" method="POST">
+    <dl>
+      <dt>Input:
+      <dd><input type="text" name="inputinfo">
+      <br>
+      <dt>Type: 
+      <dd>
+        <select name="type" onchange="submit()">
+        <option value="name">name</option>
+        <option value="email">email</option>
+        <option value="password">password</option>
+        <option value="passwordHash">passwordHash</option>
+        </select>      
+    </dl>
+    <p><input type="submit" value="Search"></p>
+    </form>
+
+    {% if infos %}
+    <p>INFOS: got {{ infos|length }} results</p>
+    <table class="formdata">
+        <tr>
+            <th>email</th>
+            <th>name</th>
+            <th>password</th>
+            <th>passwordHash</th>
+        </tr>
+        {% for doc in infos %}
+        <tr>
+            <td>{{ doc['email'] }}</td>
+            <td>{{ doc['name'] }}</td>
+            <td>{{ doc['password'] }}</td>
+            <td>{{ doc['passwordHash'] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+        <p>NO INFOS</p>
+    {% endif %}
+
+{% endblock %}

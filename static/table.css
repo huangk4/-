@@ -22,8 +22,9 @@ table.formdata td{         /*表格行*/
     border:1px solid #ABABAB;   /* 单元格边框 */ 
 } 
 table.formdata input{          /*可输入区域样式*/ 
-    width:100px;  www.2cto.com
+    width:100px;
     padding:1px 3px 1px 3px; 
     margin:0px; 
     border:none;                /* 输入框不要边框 */ 
     font-family:Arial; 
+}
