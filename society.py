@@ -3,18 +3,32 @@ from pymongo import MongoClient
 from flask import Flask, request, session, redirect, \
     render_template, url_for, flash, jsonify, abort
 from werkzeug import secure_filename
+from flask_restful import Api, Resource
 import os
 import random
 import string
 import re
 
-
 #这里写宏和配置信息
+
+
+#flask的相关配置
+secret_key = 'development'
+usr_name = 'admin'
+usr_pwd = 'adadadad'
+upload_dir = 'static/tmp'
+APP_URL = 'http://127.0.0.1:5000'
+#-----------------
+
+#配置信息
+ALLOWED_EXTENSIONS = set(allowed_filetype)#允许上传的类型
+
 g_server_ip='192.168.65.137'
 g_server_port=27017
 g_db_name='test'  #库名表名先用自己的
 g_tb_name='table_one'
 ALLOWED_EXTENSIONS = set(['txt', 'csv'])#允许上传的类型
+
 basedir = os.path.abspath(os.path.dirname(__file__))
 #-----------------
 
@@ -26,39 +40,97 @@ db = client[g_db_name]
 
 app = Flask(__name__)
 
-
 #默认配置
 app.config.update(dict(
     DEBUG = True,
-    SECRET_KEY = 'development',
-    USERNAME = 'admin',
-    PASSWORD = 'adadad'
+    SECRET_KEY = secret_key,
+    USERNAME = usr_name,
+    PASSWORD = usr_pwd,
+    UPLOAD_FOLDER = upload_dir
 ))
+# app.config.from_object('config.py')
+# app.config['UPLOAD_FOLDER']='static/tmp'#上传文件目录
 
-app.config['UPLOAD_FOLDER']='static/tmp'#上传文件目录
+class Person(Resource):
+    '''人员类'''
+    def get(self, name=None, email=None):
+        #data用于存储获取到的信息
+        data = []
 
+        if name and email:
+            persons_info = db.person.find({"name": name, "email": email}, {"_id": 0})
+        
+        elif name:
+            persons_info = db.person.find({"name": name}, {"_id": 0})
+        
+        elif email:
+            persons_info = db.person.find({"email": email}, {"_id": 0})
+            
+        else:
+            persons_info = db.person.find({}, {"_id": 0, "update_time": 0}).limit(10)
+            for person in persons_info:
+                data.append(person)
 
+            return jsonify({"response": data})
+ 
+        if persons_info:
+            for person in persons_info:
+                data.append(person)
 
-@app.route('/test_it')
-def web_show(param='name',word='ak'): #这里不知道怎么传参数，能解决的就帮忙解决一下
-    show='<center>'
-    try:
-        results=db.person.find({param:word})
-        for result in results:            
-            show=show+str(result)
-            show=show+'<p>'
-    except:
-        return show
-    show=show+'</center>'
-    return show
+            return jsonify({"status": "ok", "data": data})
+        else:
+            return {"response": "no person found for {} {}".format(name, email)}
+
+    def post(self):
+        '''
+        以json格式进行提交文档
+        '''
+        data = request.get_json()
+        if not data:
+            return {"response": "ERROR DATA"}
+        else:
+            name = data.get('name')
+            email = email.get('email')
+
+            if name and email:
+                if db.person.find_one({"name": name, "email": email}, {"_id": 0}):
+                    return {"response": "{{} {} already exists.".format(name, email)}
+                else:
+                    db.person.insert(data)
+            else:
+                return redirect(url_for("person"))
     
+    def put(self, name, email):
+        '''
+        根据name和email进行定位更新数据
+        '''
+        data = request.get_json()
+        db.person.update({'name': name, 'email': email},{'$set': data})
+        return redirect(url_for("person"))
+
+    def delete(self, email):
+        '''
+        email作为唯一值, 对其进行删除
+        '''
+        db.person.remove({'email': email})
+        return redirect(url_for("person"))
+
+#添加api资源
+api = Api(app)
+api.add_resource(Person, "/api", endpoint="person")
+api.add_resource(Person, "/api/name/<string:name>", endpoint="name")
+api.add_resource(Person, "/api/email/<string:email>", endpoint="email")
+
 @app.route('/')
 def main_redirect():
+    '''初始页面定向'''
+    # if session['logged_in'] is True:
+    #     return redirect(url_for('searchinfo'))
     return redirect(url_for('login'))
         
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    '''登录'''
+    '''登录模块'''
     error = None
     if request.method == 'POST':
         if request.form['username'] != app.config['USERNAME']:
@@ -73,14 +145,15 @@ def login():
 
 @app.route('/logout')
 def logout():
+    '''登出模块'''
     session.pop('logged_in', None)
     flash('You were logged out')
     return redirect(url_for('searchinfo'))
 
 def allowed_file(filename):
+    '''允许上传的文件类型'''
     return '.' in filename and \
            filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
-
 
 #接受上传文件并导入数据，删除上传文件
 @app.route('/upload',methods=['GET','POST'],strict_slashes=False)
@@ -140,7 +213,6 @@ def upload():
         else:
             return "上传失败"
 
-
 #单条导入
 @app.route('/insert_one',methods=['GET','POST'],strict_slashes=False)
 def insert_one():
@@ -155,7 +227,6 @@ def insert_one():
             linedata[i]=request.form[i]
         db.person.save(linedata)
         return 'success'
-
 
 #信息导入页面
 @app.route('/insert_data')
@@ -210,7 +281,6 @@ def searchinfo():
     if request.method == 'GET':
         return render_template('searchinfo.html')
 
-
 # #查询函数，param为查询字段，word为查询的值
 # def search(param,word):
 #    try:
@@ -219,6 +289,7 @@ def searchinfo():
 #            print(result)
 #    except:
 #        print('没有结果')
+
 
 
 #邮箱后缀分析函数,查询数据库返回所有邮箱后缀及所占比的字典
@@ -296,5 +367,6 @@ if __name__=='__main__':
     #app.run()
     print(analysis_source())
     
+
     
 
