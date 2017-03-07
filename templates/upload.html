@@ -1,6 +1,36 @@
 {% extends "layout.html" %}
 {% block body %}
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='table.css') }}">
+
+<h1>命令导入</h1>
+<form action="command" method="post">
+<input type="text" name="command" id="command" size="50"/>
+<input type="submit" name="执行">
+</form>
+
+<hr align=center  color=#987cb9 size=1>
+
+<h1>快速导入</h1>
+<form action="insert_one" method="post"> 
+<table class="formdata"> 
+<caption>请输入基本数据并提交(数据没有可空缺）</caption> 
+<tr> 
+{% for column in columns %}
+    <th scope="col">{{column}}</th>
+{% endfor %}
+</tr> 
+<tr> 
+{% for column in columns %}
+    <td><input type="text" name="{{column}}" id="{{column}}"/></td> 
+{% endfor %}
+</tr> 
+</table> 
+<input type="submit" name="提交">
+</form> 
+
+<hr align=center  color=#987cb9 size=1>
+
+
 <h1>批量导入</h1>
 以':'区分键和值,txt以' '分开数据,csv以','分开数据，如：
 <p>
@@ -15,24 +45,7 @@ csv文件:name:999,emai:asdfse342@163.com
 <input type=submit value="导入">
 </p>
 </form>
-<h1>快速导入</h1>
-<form action="insert_one" method="post"> 
-<table class="formdata"> 
-<caption>请输入基本数据并提交(数据没有可空缺）</caption> 
-<tr> 
-{% for column in columns %}
-    <th scope="col">{{column}}</th>
-{% endfor %}
-</tr> 
 
-<tr> 
-{% for column in columns %}
-    <td><input type="text" name="{{column}}" id="{{column}}"/></td> 
-{% endfor %}
-</tr> 
-</table> 
-<input type="submit" name="提交">
-</form> 
 <br> 
 <br> 
 

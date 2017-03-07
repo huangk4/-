@@ -1,3 +1,8 @@
+import sys
+sys.path.append("../")
+import s_config.py
+
+
 #接受上传文件并导入数据，删除上传文件
 @app.route('/upload',methods=['GET','POST'],strict_slashes=False)
 def upload(): 

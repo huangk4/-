@@ -1,0 +1,30 @@
+society.py为主函数
+
+其中13-17行需配置
+g_server_ip='192.168.65.137'	//mongodb数据库地址
+g_server_port=27017		//数据库端口
+g_db_name='test'  		//数据库名
+g_tb_name='table_one'		//数据表名
+ALLOWED_EXTENSIONS = ['txt', 'csv']//允许上传的类型
+
+
+
+启动后
+
+http://127.0.0.1:5000/insert_data  此为插入数据处
+
+http://127.0.0.1:5000/searchinfo   此处为搜索数据
+
+http://127.0.0.1:5000/analysis     此处为数据来源分析
+
+
+
+所用到的库
+
+pymongo
+flask
+flask_restful 
+os
+random
+string
+re
