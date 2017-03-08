@@ -27,15 +27,11 @@ app = Flask(__name__)
 #flask app config
 debug = True,
 secret_key = 'development',
-usr_name = 'admin',
-usr_pwd = 'adadadad',
 upload_dir = 'static/tmp'
 
 app.config.update(dict(
     DEBUG = True,
     SECRET_KEY = secret_key,
-    USERNAME = usr_name,
-    PASSWORD = usr_pwd,
     UPLOAD_FOLDER = upload_dir
 ))
 # app.config.from_object('config.py')
@@ -244,32 +240,8 @@ api.add_resource(Person, "/api/email/<string:email>", endpoint="email")
 @app.route('/')
 def main_redirect():
     '''初始页面定向'''
-    if session['logged_in'] is True:
-        return redirect(url_for('searchinfo'))
-    return redirect(url_for('login'))
-        
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    '''登录模块'''
-    error = None
-    if request.method == 'POST':
-        if request.form['username'] != app.config['USERNAME']:
-            error = 'Invalid username'
-        elif request.form['password'] != app.config['PASSWORD']:
-            error = 'Invalid password'
-        else:
-            session['logged_in'] = True
-            flash('You were logged in')
-            return redirect(url_for('searchinfo'))
-    return render_template('login.html', error=error)
-
-@app.route('/logout')
-def logout():
-    '''登出模块'''
-    session.pop('logged_in', None)
-    flash('You were logged out')
     return redirect(url_for('searchinfo'))
-
+        
 def allowed_file(filename):
     '''允许上传的文件类型'''
     return '.' in filename and \
