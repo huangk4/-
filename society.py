@@ -124,7 +124,7 @@ def upload():
         else:
             return "<center><h1><br><br>上传失败</h1></center>"
 
-#单条导入
+#快速导入
 @app.route('/insert_one',methods=['GET','POST'],strict_slashes=False)
 def insert_one():
     if request.method == 'POST':
@@ -139,6 +139,7 @@ def insert_one():
         db.person.save(linedata)
         return '<center><h1><br><br>导入成功</h1></center>'
 
+#命令导入
 @app.route('/command',methods=['GET','POST'],strict_slashes=False)
 def cmd_insert():
     if request.method=='POST':
@@ -148,19 +149,13 @@ def cmd_insert():
     result='<center><h1><br><br>'+command_import(command)+'</h1></center>'
     return result
 
-#信息导入页面
+#信息导入主页面
 @app.route('/insert_data')
 def main_upload():
 
-    for line in db.person.find({},{"_id":0}).limit(1):
-        #返回一行数据,{"_id":0}即不显示_id
-        pass
 
     #columns为所有列名的列表
-    columns=[]
-    for i in line:
-        columns.append(i)    
-    columns.sort()
+    columns=('name','email','password','passwordhash','xtime')
     return render_template('upload.html',columns=columns)
 
 
