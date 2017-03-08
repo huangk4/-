@@ -17,7 +17,7 @@ http://127.0.0.1:5000/searchinfo   此处为搜索数据
 
 http://127.0.0.1:5000/analysis     此处为数据来源分析
 
-
+本地  -module remote_import.py模块可直接命令行使用，也可在FLASK下/insert_data里使用
 
 所用到的库
 
