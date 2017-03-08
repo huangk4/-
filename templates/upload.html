@@ -3,6 +3,9 @@
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='table.css') }}">
 
 <h1>命令导入</h1>
+<text>如：remote_import.py -f d://test.csv -format d://test.json 
+<br>(在flask中第一个参数(*.py)可为任意值，但不可省略)
+</text>
 <form action="command" method="post">
 <input type="text" name="command" id="command" size="50"/>
 <input type="submit" name="执行">
